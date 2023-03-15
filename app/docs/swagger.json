@@ -1,0 +1,2044 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "0.0.1",
+    "title": "Engine QA API Web Service",
+    "description": "Engine QA API Web Service"
+  },
+  "host": "##HOST_PLACEHOLDER##",
+  "basePath": "/api",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/docs/swagger.json": {
+      "get": {
+        "summary": "Get this Swagger 2.0 definition",
+        "description": "Get this Swagger 2.0 definition",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "file"
+            }
+          }
+        }
+      }
+    },
+    "/docs/swaggerv2.json": {
+      "get": {
+        "summary": "Get this Swagger 2.0 definition Version 2",
+        "description": "Get this Swagger 2.0 definition Version 2",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "file"
+            }
+          }
+        }
+      }
+    },
+    "/echo/{status}": {
+      "post": {
+        "summary": "Echoes back request",
+        "description": "Echoes headers, querystring, and request body",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "status",
+            "description": "Status code to be returned",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "body",
+            "name": "echoRequest",
+            "description": "Request body to be echoed",
+            "schema": {
+              "$ref": "#/definitions/echoRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/echoResponse"
+            }
+          }
+        }
+      }
+    },
+    "/echo-from-text/{status}": {
+      "post": {
+        "summary": "Echoes text as json",
+        "description": "Echoes headers, querystring, and request body",
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "status",
+            "description": "Status code to be returned",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "body",
+            "name": "echoRequest",
+            "x-ntx-summary": "Text request body to be echoed as json",
+            "description": "{\"abc\": 123, \"def\": true, \"ghi\": \"value1\"}",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/echoResponse"
+            }
+          }
+        }
+      }
+    },
+    "/files/errors/{status}": {
+      "get": {
+        "summary": "Download error",
+        "description": "Returns error code instead of image for download",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "status",
+            "description": "Error status code to be returned",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "produces": [
+          "images/jpeg"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "file": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/download/base64": {
+      "get": {
+        "summary": "Download file as base64",
+        "description": "Download file as base64",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "fileContent": {
+                  "type": "string",
+                  "format": "byte"
+                },
+                "originalName": {
+                  "type": "string",
+                  "description": "Original file name Output",
+                  "x-ntx-summary": "Original file name Output"
+                },
+                "mimeType": {
+                  "type": "string",
+                  "description": "MIME type Output",
+                  "x-ntx-summary": "MIME type Output"
+                },
+                "md5": {
+                  "type": "string",
+                  "description": "MD5 Output",
+                  "x-ntx-summary": "MD5 Output"
+                },
+                "size": {
+                  "type": "integer",
+                  "description": "File size Output",
+                  "x-ntx-summary": "File size Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/download/base64/multi": {
+      "get": {
+        "summary": "Download multiple files as base64",
+        "description": "Download multiple files as base64",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "description": "Number of files",
+                  "x-ntx-summary": "Number of files"
+                },
+                "files": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "fileContent": {
+                        "type": "string",
+                        "format": "byte"
+                      },
+                      "originalName": {
+                        "type": "string",
+                        "description": "Original file name Output",
+                        "x-ntx-summary": "Original file name Output"
+                      },
+                      "mimeType": {
+                        "type": "string",
+                        "description": "MIME type Output",
+                        "x-ntx-summary": "MIME type Output"
+                      },
+                      "md5": {
+                        "type": "string",
+                        "description": "MD5 Output",
+                        "x-ntx-summary": "MD5 Output"
+                      },
+                      "size": {
+                        "type": "integer",
+                        "description": "File size Output",
+                        "x-ntx-summary": "File size Output"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/download/base64/multi/flattened": {
+      "get": {
+        "summary": "Download multiple files as base64 in flattened array",
+        "description": "Download multiple files as base64 in flattened array",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "description": "Number of files",
+                  "x-ntx-summary": "Number of files"
+                },
+                "files": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "byte"
+                  }
+                },
+                "metadata": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "originalName": {
+                        "type": "string",
+                        "description": "Original file name Output",
+                        "x-ntx-summary": "Original file name Output"
+                      },
+                      "mimeType": {
+                        "type": "string",
+                        "description": "MIME type Output",
+                        "x-ntx-summary": "MIME type Output"
+                      },
+                      "md5": {
+                        "type": "string",
+                        "description": "MD5 Output",
+                        "x-ntx-summary": "MD5 Output"
+                      },
+                      "size": {
+                        "type": "integer",
+                        "description": "File size Output",
+                        "x-ntx-summary": "File size Output"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/upload/base64": {
+      "post": {
+        "summary": "Upload file as base64",
+        "description": "Upload file as base64",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "rootBody",
+            "description": "Root Body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "fileContent": {
+                  "description": "File to upload",
+                  "x-ntx-summary": "File to upload",
+                  "type": "string",
+                  "format": "byte"
+                },
+                "customName": {
+                  "description": "Custom name with extension",
+                  "x-ntx-summary": "Custom name with extension",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "customName": {
+                  "type": "string",
+                  "description": "Custom file name Output",
+                  "x-ntx-summary": "Custom file name Output"
+                },
+                "mimeType": {
+                  "type": "string",
+                  "description": "MIME type Output",
+                  "x-ntx-summary": "MIME type Output"
+                },
+                "md5": {
+                  "type": "string",
+                  "description": "MD5 Output",
+                  "x-ntx-summary": "MD5 Output"
+                },
+                "size": {
+                  "type": "integer",
+                  "description": "File size Output",
+                  "x-ntx-summary": "File size Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/upload/base64/multi": {
+      "post": {
+        "summary": "Upload multiple files as base64",
+        "description": "Upload multiple files as base64",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "rootBody",
+            "description": "Root Body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "fileContent": {
+                    "description": "File to upload",
+                    "x-ntx-summary": "File to upload",
+                    "type": "string",
+                    "format": "byte"
+                  },
+                  "customName": {
+                    "description": "Custom name with extension",
+                    "x-ntx-summary": "Custom name with extension",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "description": "Number of files",
+                  "x-ntx-summary": "Number of files"
+                },
+                "files": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "customName": {
+                        "type": "string",
+                        "description": "Custom file name Output",
+                        "x-ntx-summary": "Custom file name Output"
+                      },
+                      "mimeType": {
+                        "type": "string",
+                        "description": "MIME type Output",
+                        "x-ntx-summary": "MIME type Output"
+                      },
+                      "md5": {
+                        "type": "string",
+                        "description": "MD5 Output",
+                        "x-ntx-summary": "MD5 Output"
+                      },
+                      "size": {
+                        "type": "integer",
+                        "description": "File size Output",
+                        "x-ntx-summary": "File size Output"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/upload/form-data": {
+      "post": {
+        "summary": "Upload file as multipart/form-data",
+        "description": "Upload file as multipart/form-data",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "file1",
+            "description": "File to upload",
+            "required": true,
+            "type": "file"
+          },
+          {
+            "in": "formData",
+            "name": "customName",
+            "description": "Custom name with extension",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "originalName": {
+                  "type": "string",
+                  "description": "Original file name Output",
+                  "x-ntx-summary": "Original file name Output"
+                },
+                "customName": {
+                  "type": "string",
+                  "description": "Custom file name Output",
+                  "x-ntx-summary": "Custom file name Output"
+                },
+                "mimeType": {
+                  "type": "string",
+                  "description": "MIME type Output",
+                  "x-ntx-summary": "MIME type Output"
+                },
+                "md5": {
+                  "type": "string",
+                  "description": "MD5 Output",
+                  "x-ntx-summary": "MD5 Output"
+                },
+                "size": {
+                  "type": "integer",
+                  "description": "File size Output",
+                  "x-ntx-summary": "File size Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/upload/form-data/multi": {
+      "post": {
+        "summary": "Upload multiple files as multipart/form-data",
+        "description": "Upload multiple files as multipart/form-data",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "file1",
+            "description": "File 1 to upload",
+            "required": true,
+            "type": "file"
+          },
+          {
+            "in": "formData",
+            "name": "file2",
+            "description": "File 2 to upload",
+            "required": true,
+            "type": "file"
+          },
+          {
+            "in": "formData",
+            "name": "customName1",
+            "description": "Custom name 1 with extension",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "customName2",
+            "description": "Custom name 2 with extension",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "description": "Number of files",
+                  "x-ntx-summary": "Number of files"
+                },
+                "files": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "originalName": {
+                        "type": "string",
+                        "description": "Original file name Output",
+                        "x-ntx-summary": "Original file name Output"
+                      },
+                      "customName": {
+                        "type": "string",
+                        "description": "Custom file name Output",
+                        "x-ntx-summary": "Custom file name Output"
+                      },
+                      "mimeType": {
+                        "type": "string",
+                        "description": "MIME type Output",
+                        "x-ntx-summary": "MIME type Output"
+                      },
+                      "md5": {
+                        "type": "string",
+                        "description": "MD5 Output",
+                        "x-ntx-summary": "MD5 Output"
+                      },
+                      "size": {
+                        "type": "integer",
+                        "description": "File size Output",
+                        "x-ntx-summary": "File size Output"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/download/octet-stream": {
+      "get": {
+        "summary": "Download file as octet-stream",
+        "description": "Download file as octet-stream",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "file"
+            }
+          }
+        }
+      }
+    },
+    "/files/upload/octet-stream": {
+      "post": {
+        "summary": "Upload file as octet-stream",
+        "description": "Upload file as octet-stream",
+        "consumes": [
+          "application/octet-stream"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "file1",
+            "description": "File to upload",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "binary"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Custom-Name",
+            "x-ntx-summary": "Custom name with extension",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "customName": {
+                  "type": "string",
+                  "description": "Custom file name Output",
+                  "x-ntx-summary": "Custom file name Output"
+                },
+                "mimeType": {
+                  "type": "string",
+                  "description": "MIME type Output",
+                  "x-ntx-summary": "MIME type Output"
+                },
+                "md5": {
+                  "type": "string",
+                  "description": "MD5 Output",
+                  "x-ntx-summary": "MD5 Output"
+                },
+                "size": {
+                  "type": "integer",
+                  "description": "File size Output",
+                  "x-ntx-summary": "File size Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/download/uri": {
+      "get": {
+        "summary": "Download file as URI",
+        "description": "Download file as URI",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "uri": {
+                  "description": "File do download",
+                  "x-ntx-summary": "File to download",
+                  "type": "string",
+                  "format": "x-ntx-file-reference"
+                },
+                "originalName": {
+                  "type": "string",
+                  "description": "Original file name Output",
+                  "x-ntx-summary": "Original file name Output"
+                },
+                "mimeType": {
+                  "type": "string",
+                  "description": "MIME type Output",
+                  "x-ntx-summary": "MIME type Output"
+                },
+                "md5": {
+                  "type": "string",
+                  "description": "MD5 Output",
+                  "x-ntx-summary": "MD5 Output"
+                },
+                "size": {
+                  "type": "integer",
+                  "description": "File size Output",
+                  "x-ntx-summary": "File size Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/download/uri/multi": {
+      "get": {
+        "summary": "Download multiple files as URI",
+        "description": "Download multiple files as URI",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "description": "Number of files",
+                  "x-ntx-summary": "Number of files"
+                },
+                "files": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "uri": {
+                        "description": "File do download",
+                        "x-ntx-summary": "File to download",
+                        "type": "string",
+                        "format": "x-ntx-file-reference"
+                      },
+                      "originalName": {
+                        "type": "string",
+                        "description": "Original file name Output",
+                        "x-ntx-summary": "Original file name Output"
+                      },
+                      "mimeType": {
+                        "type": "string",
+                        "description": "MIME type Output",
+                        "x-ntx-summary": "MIME type Output"
+                      },
+                      "md5": {
+                        "type": "string",
+                        "description": "MD5 Output",
+                        "x-ntx-summary": "MD5 Output"
+                      },
+                      "size": {
+                        "type": "integer",
+                        "description": "File size Output",
+                        "x-ntx-summary": "File size Output"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/download/uri/multi/flattened": {
+      "get": {
+        "summary": "Download multiple files as URI in flattened array",
+        "description": "Download multiple files as URI in flattened array",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "description": "Number of files",
+                  "x-ntx-summary": "Number of files"
+                },
+                "files": {
+                  "type": "array",
+                  "items": {
+                    "description": "File do download",
+                    "x-ntx-summary": "File to download",
+                    "type": "string",
+                    "format": "x-ntx-file-reference"
+                  }
+                },
+                "metadata": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "originalName": {
+                        "type": "string",
+                        "description": "Original file name Output",
+                        "x-ntx-summary": "Original file name Output"
+                      },
+                      "mimeType": {
+                        "type": "string",
+                        "description": "MIME type Output",
+                        "x-ntx-summary": "MIME type Output"
+                      },
+                      "md5": {
+                        "type": "string",
+                        "description": "MD5 Output",
+                        "x-ntx-summary": "MD5 Output"
+                      },
+                      "size": {
+                        "type": "integer",
+                        "description": "File size Output",
+                        "x-ntx-summary": "File size Output"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/upload/uri": {
+      "post": {
+        "summary": "Upload file as URI",
+        "description": "Upload file as URI",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "rootBody",
+            "description": "Root Body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "fileUri": {
+                  "description": "File to upload",
+                  "x-ntx-summary": "File to upload",
+                  "type": "string",
+                  "format": "x-ntx-file-reference"
+                },
+                "customName": {
+                  "description": "Custom name with extension",
+                  "x-ntx-summary": "Custom name with extension",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "customName": {
+                  "type": "string",
+                  "description": "Custom file name Output",
+                  "x-ntx-summary": "Custom file name Output"
+                },
+                "mimeType": {
+                  "type": "string",
+                  "description": "MIME type Output",
+                  "x-ntx-summary": "MIME type Output"
+                },
+                "md5": {
+                  "type": "string",
+                  "description": "MD5 Output",
+                  "x-ntx-summary": "MD5 Output"
+                },
+                "size": {
+                  "type": "integer",
+                  "description": "File size Output",
+                  "x-ntx-summary": "File size Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/upload/uri/multi": {
+      "post": {
+        "summary": "Upload multiple files as URI",
+        "description": "Upload multiple files as URI",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "rootBody",
+            "description": "Root Body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "fileUri": {
+                    "description": "File to upload",
+                    "x-ntx-summary": "File to upload",
+                    "type": "string",
+                    "format": "x-ntx-file-reference"
+                  },
+                  "customName": {
+                    "description": "Custom name with extension",
+                    "x-ntx-summary": "Custom name with extension",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "description": "Number of files",
+                  "x-ntx-summary": "Number of files"
+                },
+                "files": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "customName": {
+                        "type": "string",
+                        "description": "Custom file name Output",
+                        "x-ntx-summary": "Custom file name Output"
+                      },
+                      "mimeType": {
+                        "type": "string",
+                        "description": "MIME type Output",
+                        "x-ntx-summary": "MIME type Output"
+                      },
+                      "md5": {
+                        "type": "string",
+                        "description": "MD5 Output",
+                        "x-ntx-summary": "MD5 Output"
+                      },
+                      "size": {
+                        "type": "integer",
+                        "description": "File size Output",
+                        "x-ntx-summary": "File size Output"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/all-types": {
+      "post": {
+        "summary": "POST all variable types",
+        "description": "POST all variable types",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "rootBody",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/rootBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/allTypesOutputs"
+            }
+          }
+        }
+      }
+    },
+    "/all-types/object": {
+      "get": {
+        "summary": "Returns hardcoded object",
+        "description": "Returns hardcoded object and text",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "expected",
+            "description": "Expected data to be returned",
+            "required": false,
+            "type": "string",
+            "default": "body",
+            "enum": [
+              "body",
+              "empty",
+              "plaintext"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/allTypesOutputsObject"
+            }
+          }
+        }
+      }
+    },
+    "/all-types/array": {
+      "get": {
+        "summary": "Returns hardcoded array",
+        "description": "Returns hardcoded array and text",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "expected",
+            "description": "Expected data to be returned",
+            "required": false,
+            "type": "string",
+            "default": "body",
+            "enum": [
+              "body",
+              "empty",
+              "plaintext"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/allTypesOutputsArray"
+            }
+          }
+        }
+      }
+    },
+    "/all-types-stringified": {
+      "post": {
+        "summary": "POST all variable types and return stringified data",
+        "description": "POST all variable types and return stringified data",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "rootBody",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/rootBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "allTypesOutputsStringified": {
+                  "type": "string",
+                  "description": "Logged Request Inputs as String",
+                  "x-ntx-summary": "Logged Request Inputs as String"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/all-types-odata": {
+      "post": {
+        "summary": "POST all variable types as oData and return stringified data",
+        "description": "POST all variable types as oData and return stringified data",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "odata",
+            "required": true,
+            "type": "string",
+            "x-ntx-query-builder": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "textInput": {
+                    "type": "string",
+                    "description": "Text Input",
+                    "x-ntx-summary": "Text Input"
+                  },
+                  "decimalInput": {
+                    "type": "number",
+                    "description": "Decimal Input",
+                    "x-ntx-summary": "Decimal Input"
+                  },
+                  "integerInput": {
+                    "type": "integer",
+                    "description": "Integer Input",
+                    "x-ntx-summary": "Integer Input"
+                  },
+                  "booleanInput": {
+                    "type": "boolean",
+                    "description": "Boolean Input",
+                    "x-ntx-summary": "Boolean Input"
+                  },
+                  "datetimeInput": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Datetime Input",
+                    "x-ntx-summary": "Datetime Input"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "allTypesOutputsStringified": {
+                  "type": "string",
+                  "description": "Logged Request Inputs as String",
+                  "x-ntx-summary": "Logged Request Inputs as String"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/all-types-nullable": {
+      "get": {
+        "summary": "GET all variable types with nullable value",
+        "description": "GET all variable types with nullable value",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "expected",
+            "description": "Expected data to be returned",
+            "required": false,
+            "type": "string",
+            "default": "validValues",
+            "enum": [
+              "validValues",
+              "explicitNull",
+              "missingProperty"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/allTypesNullableOutputsObject"
+            }
+          }
+        }
+      }
+    },
+    "/file-nullable": {
+      "get": {
+        "summary": "GET base64 file with nullable value",
+        "description": "GET base64 file with nullable value",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "expected",
+            "description": "Expected data to be returned",
+            "required": false,
+            "type": "string",
+            "default": "validValues",
+            "enum": [
+              "validValues",
+              "explicitNull",
+              "missingProperty"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/base64FileNullableOutputsObject"
+            }
+          }
+        }
+      }
+    },
+    "/all-parameter-types/{string-path}/{integer-path}/{boolean-path}": {
+      "post": {
+        "summary": "POST all parameter types",
+        "description": "POST all parameter types",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "string_header",
+            "x-ntx-summary": "Text Header Input",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "integer_header",
+            "x-ntx-summary": "Integer Header Input",
+            "type": "integer"
+          },
+          {
+            "in": "header",
+            "name": "boolean_header",
+            "x-ntx-summary": "Boolean Header Input",
+            "type": "boolean"
+          },
+          {
+            "in": "path",
+            "name": "string-path",
+            "x-ntx-summary": "Text Path Input",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "integer-path",
+            "x-ntx-summary": "Integer Path Input",
+            "type": "integer",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "boolean-path",
+            "x-ntx-summary": "Boolean Path Input",
+            "type": "boolean",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "string_query",
+            "description": "Text Query Input",
+            "x-ntx-summary": "Text Query Input",
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "integer_query",
+            "description": "Integer Query Input",
+            "x-ntx-summary": "Integer Query Input",
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "boolean_query",
+            "description": "Boolean Query Input",
+            "x-ntx-summary": "boolean Query Input",
+            "type": "boolean"
+          },
+          {
+            "in": "body",
+            "name": "string_body",
+            "description": "Request Body",
+            "x-ntx-summary": "Request Body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "description": "Text Property Body Input",
+                  "x-ntx-summary": "Text Property Body Input"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/allParameterTypesRootOutput"
+            }
+          }
+        }
+      }
+    },
+    "/path-encoding/{string-path}": {
+      "post": {
+        "summary": "POST text route path encoding",
+        "description": "Returns literal route path for testing encoding performed by the caller",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "string-path",
+            "x-ntx-summary": "Text Path Input",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "inputs": {
+                  "type": "object",
+                  "description": "Logged Request Inputs",
+                  "x-ntx-summary": "Logged Request Inputs"
+                },
+                "path": {
+                  "type": "string",
+                  "description": "Text Path Output",
+                  "x-ntx-summary": "Text Path Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/query-encoding": {
+      "post": {
+        "summary": "POST text query string encoding",
+        "description": "Returns literal querystring for testing encoding performed by the caller",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "string_query",
+            "description": "Text Query Input",
+            "x-ntx-summary": "Text Query Input",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "inputs": {
+                  "type": "object",
+                  "description": "Logged Request Inputs",
+                  "x-ntx-summary": "Logged Request Inputs"
+                },
+                "query": {
+                  "type": "string",
+                  "description": "Text Query Output",
+                  "x-ntx-summary": "Text Query Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/form-urlencoded/{string-path}/parsed": {
+      "post": {
+        "summary": "POST x-www-form-urlencoded content-type",
+        "description": "Returns parsed form-urlencoded data",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "string-path",
+            "x-ntx-summary": "Text Path Input",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "formData",
+            "name": "string",
+            "x-ntx-summary": "Text Form Input",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "decimal",
+            "x-ntx-summary": "Decimal Form Input",
+            "type": "number"
+          },
+          {
+            "in": "formData",
+            "name": "integer",
+            "x-ntx-summary": "Integer Form Input",
+            "type": "integer"
+          },
+          {
+            "in": "formData",
+            "name": "boolean",
+            "x-ntx-summary": "Boolean Form Input",
+            "type": "boolean"
+          },
+          {
+            "in": "formData",
+            "name": "datetime",
+            "x-ntx-summary": "Datetime Form Input",
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "inputs": {
+                  "type": "object",
+                  "description": "Logged Request Inputs",
+                  "x-ntx-summary": "Logged Request Inputs"
+                },
+                "outputs": {
+                  "type": "object",
+                  "properties": {
+                    "textPathOutput": {
+                      "type": "string",
+                      "description": "Text Path Output",
+                      "x-ntx-summary": "Text Path Output"
+                    },
+                    "textOutput": {
+                      "type": "string",
+                      "description": "Text Output",
+                      "x-ntx-summary": "Text Output"
+                    },
+                    "decimalOutput": {
+                      "type": "number",
+                      "description": "Decimal Output",
+                      "x-ntx-summary": "Decimal Output"
+                    },
+                    "integerOutput": {
+                      "type": "integer",
+                      "description": "Integer Output",
+                      "x-ntx-summary": "Integer Output"
+                    },
+                    "booleanOutput": {
+                      "type": "boolean",
+                      "description": "Boolean Output",
+                      "x-ntx-summary": "Boolean Output"
+                    },
+                    "datetimeOutput": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Datetime Output",
+                      "x-ntx-summary": "Datetime Output"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/async-callback": {
+      "post": {
+        "summary": "POST async-callback",
+        "description": "Calls back with different outcomes",
+        "x-ntx-long-running-operation": true,
+        "x-ntx-notification-content": {
+          "description": "Result",
+          "schema": {
+            "$ref": "#/definitions/asyncCallbackResult"
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "callbackUrl",
+            "x-ntx-summary": "callback url",
+            "description": "callback url",
+            "x-ntx-notification-url": true,
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "requestBody",
+            "description": "Request Body",
+            "x-ntx-summary": "Request Body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "initialStatusCode": {
+                  "type": "integer",
+                  "description": "Initial status code to be returned",
+                  "x-ntx-summary": "Initial Status Code"
+                },
+                "textInput": {
+                  "type": "string",
+                  "description": "Text Input",
+                  "x-ntx-summary": "Text Input"
+                },
+                "resultStatus": {
+                  "type": "string",
+                  "description": "Status to be returned in querystring",
+                  "x-ntx-summary": "Status to be returned in querystring"
+                },
+                "payloadStatus": {
+                  "type": "string",
+                  "description": "Status to be returned in respose body",
+                  "x-ntx-summary": "Status to be returned in respose body"
+                },
+                "errorMessage": {
+                  "type": "string",
+                  "description": "Error message to be returned",
+                  "x-ntx-summary": "Error message to be returned"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Result after asynchronous processing",
+            "schema": {
+              "$ref": "#/definitions/asyncCallbackResult"
+            }
+          },
+          "202": {
+            "description": "Accepted for processing",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "receiptId": {
+                  "type": "string",
+                  "description": "Receipt Id",
+                  "x-ntx-summary": "Receipt Id"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sleep": {
+      "get": {
+        "summary": "GET response after 75 seconds",
+        "description": "GET response after 75 seconds",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/data/array/integer": {
+      "get": {
+        "summary": "Returns array of integers",
+        "description": "Returns array of integers",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "elements",
+            "description": "Number of elements to be returned",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "echoRequest": {
+      "type": "object"
+    },
+    "echoResponse": {
+      "type": "object"
+    },
+    "rootBody": {
+      "type": "object",
+      "properties": {
+        "allTypesInputs": {
+          "type": "object",
+          "properties": {
+            "textInput": {
+              "type": "string",
+              "description": "Text Input",
+              "x-ntx-summary": "Text Input"
+            },
+            "decimalInput": {
+              "type": "number",
+              "description": "Decimal Input",
+              "x-ntx-summary": "Decimal Input"
+            },
+            "integerInput": {
+              "type": "integer",
+              "description": "Integer Input",
+              "x-ntx-summary": "Integer Input"
+            },
+            "booleanInput": {
+              "type": "boolean",
+              "description": "Boolean Input",
+              "x-ntx-summary": "Boolean Input"
+            },
+            "datetimeInput": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Datetime Input",
+              "x-ntx-summary": "Datetime Input"
+            },
+            "collectionInput": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "Collection Item Input"
+              },
+              "description": "Collection Input",
+              "x-ntx-summary": "Collection Input"
+            }
+          }
+        }
+      }
+    },
+    "allTypesOutputs": {
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "type": "object",
+          "description": "Logged Request Inputs",
+          "x-ntx-summary": "Logged Request Inputs"
+        },
+        "outputs": {
+          "type": "object",
+          "properties": {
+            "textOutput": {
+              "type": "string",
+              "description": "Text Output",
+              "x-ntx-summary": "Text Output"
+            },
+            "decimalOutput": {
+              "type": "number",
+              "description": "Decimal Output",
+              "x-ntx-summary": "Decimal Output"
+            },
+            "integerOutput": {
+              "type": "integer",
+              "description": "Integer Output",
+              "x-ntx-summary": "Integer Output"
+            },
+            "booleanOutput": {
+              "type": "boolean",
+              "description": "Boolean Output",
+              "x-ntx-summary": "Boolean Output"
+            },
+            "datetimeOutput": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Datetime Output",
+              "x-ntx-summary": "Datetime Output"
+            },
+            "collectionOutput": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "Collection Item Output"
+              },
+              "description": "Collection Output",
+              "x-ntx-summary": "Collection Output"
+            }
+          }
+        }
+      }
+    },
+    "allTypesOutputsObject": {
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "type": "object",
+          "description": "Logged Request Inputs",
+          "x-ntx-summary": "Logged Request Inputs"
+        },
+        "outputs": {
+          "type": "object",
+          "properties": {
+            "object": {
+              "type": "object",
+              "properties": {
+                "asObject": {
+                  "type": "object",
+                  "description": "Hardcoded object as object type",
+                  "x-ntx-summary": "Hardcoded object as object type"
+                },
+                "asString": {
+                  "type": "string",
+                  "description": "Hardcoded object as string type",
+                  "x-ntx-summary": "Hardcoded object as string type"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "allTypesOutputsArray": {
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "type": "object",
+          "description": "Logged Request Inputs",
+          "x-ntx-summary": "Logged Request Inputs"
+        },
+        "outputs": {
+          "type": "object",
+          "properties": {
+            "object": {
+              "type": "object",
+              "properties": {
+                "asArray": {
+                  "type": "array",
+                  "items": {},
+                  "description": "Hardcoded array as array type",
+                  "x-ntx-summary": "Hardcoded array as array type"
+                },
+                "asString": {
+                  "type": "string",
+                  "description": "Hardcoded array as string type",
+                  "x-ntx-summary": "Hardcoded array as string type"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "allTypesNullableOutputsObject": {
+      "type": "object",
+      "properties": {
+        "outputs": {
+          "type": "object",
+          "properties": {
+            "textOutput": {
+              "type": "string",
+              "description": "Text Output",
+              "x-ntx-summary": "Text Output"
+            },
+            "decimalOutput": {
+              "type": "number",
+              "description": "Decimal Output",
+              "x-ntx-summary": "Decimal Output"
+            },
+            "integerOutput": {
+              "type": "integer",
+              "description": "Integer Output",
+              "x-ntx-summary": "Integer Output"
+            },
+            "booleanOutput": {
+              "type": "boolean",
+              "description": "Boolean Output",
+              "x-ntx-summary": "Boolean Output"
+            },
+            "datetimeOutput": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Datetime Output",
+              "x-ntx-summary": "Datetime Output"
+            },
+            "textCollectionOutput": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "Text Collection Item Output"
+              },
+              "description": "Text Collection Output",
+              "x-ntx-summary": "Text Collection Output"
+            },
+            "decimalCollectionOutput": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "description": "Decimal Collection Item Output"
+              },
+              "description": "Decimal Collection Output",
+              "x-ntx-summary": "Decimal Collection Output"
+            },
+            "integerCollectionOutput": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "description": "Integer Collection Item Output"
+              },
+              "description": "Integer Collection Output",
+              "x-ntx-summary": "Integer Collection Output"
+            },
+            "booleanCollectionOutput": {
+              "type": "array",
+              "items": {
+                "type": "boolean",
+                "description": "Boolean Collection Item Output"
+              },
+              "description": "Boolean Collection Output",
+              "x-ntx-summary": "Boolean Collection Output"
+            },
+            "datetimeCollectionOutput": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Datetime Collection Item Output"
+              },
+              "description": "Datetime Collection Output",
+              "x-ntx-summary": "Datetime Collection Output"
+            },
+            "ObjectCollectionOutput": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "textOutput": {
+                    "type": "string",
+                    "description": "Text Output",
+                    "x-ntx-summary": "Text Output"
+                  },
+                  "decimalOutput": {
+                    "type": "number",
+                    "description": "Decimal Output",
+                    "x-ntx-summary": "Decimal Output"
+                  },
+                  "integerOutput": {
+                    "type": "integer",
+                    "description": "Integer Output",
+                    "x-ntx-summary": "Integer Output"
+                  },
+                  "booleanOutput": {
+                    "type": "boolean",
+                    "description": "Boolean Output",
+                    "x-ntx-summary": "Boolean Output"
+                  },
+                  "datetimeOutput": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Datetime Output",
+                    "x-ntx-summary": "Datetime Output"
+                  }
+                },
+                "description": "Object Collection Item Output"
+              },
+              "description": "Object Collection Output",
+              "x-ntx-summary": "Object Collection Output"
+            }
+          }
+        }
+      }
+    },
+    "base64FileNullableOutputsObject": {
+      "type": "object",
+      "properties": {
+        "outputs": {
+          "type": "object",
+          "properties": {
+            "fileOutput": {
+              "type": "object",
+              "properties": {
+                "fileContent": {
+                  "type": "string",
+                  "format": "byte"
+                },
+                "originalName": {
+                  "type": "string",
+                  "description": "Original file name Output",
+                  "x-ntx-summary": "Original file name Output"
+                },
+                "mimeType": {
+                  "type": "string",
+                  "description": "MIME type Output",
+                  "x-ntx-summary": "MIME type Output"
+                },
+                "md5": {
+                  "type": "string",
+                  "description": "MD5 Output",
+                  "x-ntx-summary": "MD5 Output"
+                },
+                "size": {
+                  "type": "integer",
+                  "description": "File size Output",
+                  "x-ntx-summary": "File size Output"
+                }
+              }
+            },
+            "fileCollectionOutput": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "byte",
+                "description": "File Collection Item Output"
+              },
+              "description": "File Collection Output",
+              "x-ntx-summary": "File Collection Output"
+            },
+            "ObjectCollectionOutput": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "fileOutput": {
+                    "type": "object",
+                    "properties": {
+                      "fileContent": {
+                        "type": "string",
+                        "format": "byte"
+                      },
+                      "originalName": {
+                        "type": "string",
+                        "description": "Original file name Output",
+                        "x-ntx-summary": "Original file name Output"
+                      },
+                      "mimeType": {
+                        "type": "string",
+                        "description": "MIME type Output",
+                        "x-ntx-summary": "MIME type Output"
+                      },
+                      "md5": {
+                        "type": "string",
+                        "description": "MD5 Output",
+                        "x-ntx-summary": "MD5 Output"
+                      },
+                      "size": {
+                        "type": "integer",
+                        "description": "File size Output",
+                        "x-ntx-summary": "File size Output"
+                      }
+                    }
+                  }
+                },
+                "description": "Object Collection Item Output"
+              },
+              "description": "Object Collection Output",
+              "x-ntx-summary": "Object Collection Output"
+            }
+          }
+        }
+      }
+    },
+    "allParameterTypesRootOutput": {
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "type": "object",
+          "description": "Logged Request Inputs",
+          "x-ntx-summary": "Logged Request Inputs"
+        },
+        "allParameterTypesOutput": {
+          "type": "object",
+          "properties": {
+            "headers": {
+              "type": "object",
+              "properties": {
+                "string_header": {
+                  "type": "string",
+                  "description": "Text Header Output",
+                  "x-ntx-summary": "Text Header Output"
+                },
+                "integer_header": {
+                  "type": "integer",
+                  "description": "Integer Header Output",
+                  "x-ntx-summary": "Integer Header Output"
+                },
+                "boolean_header": {
+                  "type": "boolean",
+                  "description": "Boolean Header Output",
+                  "x-ntx-summary": "Boolean Header Output"
+                }
+              }
+            },
+            "path": {
+              "type": "object",
+              "properties": {
+                "string-path": {
+                  "type": "string",
+                  "description": "Text Path Output",
+                  "x-ntx-summary": "Text Path Output"
+                },
+                "integer-path": {
+                  "type": "integer",
+                  "description": "Integer Path Output",
+                  "x-ntx-summary": "Integer Path Output"
+                },
+                "boolean-path": {
+                  "type": "boolean",
+                  "description": "Boolean Path Output",
+                  "x-ntx-summary": "Boolean Path Output"
+                }
+              }
+            },
+            "querystring": {
+              "type": "object",
+              "properties": {
+                "string_query": {
+                  "type": "string",
+                  "description": "Text Query Output",
+                  "x-ntx-summary": "Text Query Output"
+                },
+                "integer_query": {
+                  "type": "integer",
+                  "description": "Integer Query Output",
+                  "x-ntx-summary": "Integer Query Output"
+                },
+                "boolean_query": {
+                  "type": "boolean",
+                  "description": "Boolean Query Output",
+                  "x-ntx-summary": "Boolean Query Output"
+                }
+              }
+            },
+            "body": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "description": "Text Property Body Output",
+                  "x-ntx-summary": "Text Property Body Output"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "asyncCallbackResult": {
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "type": "object",
+          "description": "Logged Request Inputs",
+          "x-ntx-summary": "Logged Request Inputs"
+        },
+        "outputs": {
+          "type": "object",
+          "properties": {
+            "textOutput": {
+              "type": "string",
+              "description": "Text Output",
+              "x-ntx-summary": "Text Output"
+            },
+            "actualResultStatus": {
+              "type": "string",
+              "description": "Status returned as querystring",
+              "x-ntx-summary": "Status returned as querystring"
+            }
+          }
+        },
+        "status": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status returned as payload property",
+              "x-ntx-summary": "Status returned as payload property"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "engine-qa-api",
+  "version": "0.0.1",
+  "description": "Engine QA Test API",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha tests/**/*.test.js --exit --timeout 10000"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "file-type": "^14.1.4",
+    "jsonfile": "^5.0.0",
+    "multer": "^1.4.2",
+    "uuid": "^3.4.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^7.1.1",
+    "sinon": "^7.5.0",
+    "supertest": "^3.4.2",
+    "validator": "^10.11.0"
+  }
+}
