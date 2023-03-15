@@ -3,8 +3,12 @@ const express = require("express");
 const axios = require("axios");
 const bodyParser = require("body-parser");
 const crypto = require("crypto");
+const fileType = require("file-type");
 const fs = require("fs");
 const jsonfile = require("jsonfile");
+const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({storage: storage});
 const path = require("path");
 
 const app = express();
@@ -12,9 +16,10 @@ const app = express();
 const asyncCallbackRoute = require("./routes/asyncCallback");
 const sleepRoute = require("./routes/sleep");
 
+const octetStreamParser = bodyParser.raw({type: 'application/octet-stream', limit: '5000mb'});
 const plainTextParser = bodyParser.text();
 
-app.use(express.json({limit: '50mb'}));
+app.use(express.json({limit: '5000mb'}));
 app.use(express.urlencoded());
 
 app.use((req, res, next) => {
@@ -100,6 +105,346 @@ app.all('/api/echo-from-text/:status?', plainTextParser, (req, res) => {
 
 app.get('/api/files/errors/:status', (req, res) => {
   res.status(req.params.status).send();
+});
+
+app.get('/api/files/download/base64', (req, res) => {
+  const filepath = path.join(__dirname, 'files', 'publicdomain.png');
+  const file = fs.readFileSync(filepath);
+
+  const content = file.toString('base64');
+  const hash = crypto.createHash('md5').update(file).digest("hex");
+
+  res.set('Content-Disposition', 'attachment; filename="publicdomain.png"');
+
+  let response = {
+    "fileContent": content,
+    "originalName": "publicdomain.png",
+    "mimeType": "image/png",
+    "md5": hash,
+    "size": Buffer.byteLength(file)
+  };
+
+  res.json(response);
+});
+
+app.get('/api/files/download/base64/multi', (req, res) => {
+
+  let response = {};
+  response["files"] = [];
+
+  filenames = ['publicdomain.png', 'creativecommons.png'];
+
+  for (let i in filenames) {
+    const filepath = path.join(__dirname, 'files', filenames[i]);
+    const file = fs.readFileSync(filepath);
+
+    const content = file.toString('base64');
+    const hash = crypto.createHash('md5').update(file).digest("hex"); 
+
+    const fileDetails = {
+      "fileContent": content,
+      "originalName": filenames[i],
+      "mimeType": "image/png",
+      "md5": hash,
+      "size": Buffer.byteLength(file)
+    };
+
+    response["files"].push(fileDetails);
+  }
+
+  response["count"] = response["files"].length;
+
+  res.json(response);
+});
+
+app.get('/api/files/download/base64/multi/flattened', (req, res) => {
+
+  let response = {};
+  response["files"] = [];
+  response["metadata"] = []
+
+  filenames = ['publicdomain.png', 'creativecommons.png'];
+
+  for (let i in filenames) {
+    const filepath = path.join(__dirname, 'files', filenames[i]);
+    const file = fs.readFileSync(filepath);
+
+    const content = file.toString('base64');
+    const hash = crypto.createHash('md5').update(file).digest("hex"); 
+
+    const fileDetails = {
+      "originalName": filenames[i],
+      "mimeType": "image/png",
+      "md5": hash,
+      "size": Buffer.byteLength(file)
+    };
+    response["files"].push(content);
+    response["metadata"].push(fileDetails);
+  }
+
+  response["count"] = response["files"].length;
+
+  res.json(response);
+});
+
+app.post('/api/files/upload/base64', async (req, res) => {
+
+  const buffer = Buffer.from(req.body["fileContent"], 'base64');
+  const mimeInfo = await fileType.fromBuffer(buffer);
+  const hash = crypto.createHash('md5').update(buffer).digest("hex");
+
+  let response = {
+    "customName": req.body["customName"],
+    "mimeType": mimeInfo["mime"],
+    "md5": hash,
+    "size": Buffer.byteLength(buffer, 'base64')
+  };
+
+  res.json(response);
+});
+
+app.post('/api/files/upload/base64/multi', async (req, res) => {
+
+  let response = {};
+  response["files"] = [];
+
+  for (let i in req.body) {
+    const buffer = Buffer.from(req.body[i]["fileContent"], 'base64');
+    const mimeInfo = await fileType.fromBuffer(buffer);
+    const hash = crypto.createHash('md5').update(buffer).digest("hex");
+
+    const fileDetails = {
+      "customName": req.body[i]["customName"],
+      "mimeType": mimeInfo["mime"],
+      "md5": hash,
+      "size": Buffer.byteLength(buffer, 'base64')
+    };
+
+    response["files"].push(fileDetails);
+  }
+
+  response["count"] = response["files"].length;
+
+  res.json(response);
+});
+
+app.post('/api/files/upload/form-data', upload.single('file1'), async (req, res) => {
+
+  const buffer = Buffer.from(req.file.buffer, 'binary');
+  const mimeInfo = await fileType.fromBuffer(buffer);
+  const hash = crypto.createHash('md5').update(buffer).digest("hex");
+
+  let response = {
+    "originalName": req.file.originalname,
+    "customName": req.body["customName"],
+    "mimeType": mimeInfo["mime"],
+    "md5": hash,
+    "size": req.file.size
+  };
+
+  res.json(response);
+});
+
+app.post('/api/files/upload/form-data/multi', upload.any(), async (req, res) => {
+
+  let response = {};
+  response["files"] = [];
+
+  const file1 = req.files[0]
+  const buffer1 = Buffer.from(file1.buffer, 'binary');
+  const mimeInfo1 = await fileType.fromBuffer(buffer1);
+  const hash1 = crypto.createHash('md5').update(buffer1).digest("hex");
+
+  let fileDetails1 = {
+    "originalName": file1.originalname,
+    "customName": req.body["customName1"],
+    "mimeType": mimeInfo1["mime"],
+    "md5": hash1,
+    "size": file1.size
+  };
+
+  response["files"].push(fileDetails1);
+
+  const file2 = req.files[1]
+  const buffer2 = Buffer.from(file2.buffer, 'binary');
+  const mimeInfo2 = await fileType.fromBuffer(buffer2);
+  const hash2 = crypto.createHash('md5').update(buffer2).digest("hex");
+
+  let fileDetails2 = {
+    "originalName": file2.originalname,
+    "customName": req.body["customName2"],
+    "mimeType": mimeInfo2["mime"],
+    "md5": hash2,
+    "size": file2.size
+  };
+
+  response["files"].push(fileDetails2);
+
+  response["count"] = response["files"].length;
+
+  res.json(response);
+});
+
+app.get('/api/files/download/octet-stream', (req, res) => {
+  const filepath = path.join(__dirname, 'files', 'publicdomain.png');
+  const file = fs.readFileSync(filepath);
+
+  res.set({
+    "Content-Disposition": "attachment; filename=\"publicdomain.png\"",
+    "originalName": "publicdomain.png",
+    "mimeType": "image/png",
+    "md5": "c9469b266705cf08cfa37f0cf834d11f",
+    "size": "6592"
+  });
+
+  res.send(file);
+});
+
+app.post('/api/files/upload/octet-stream', octetStreamParser, async (req, res) => {
+
+  const hash = crypto.createHash('md5').update(req.body).digest("hex");
+  const mimeInfo = await fileType.fromBuffer(req.body)
+    .then((result) => {
+
+      let response = {
+        "customName": req.headers["custom-name"],
+        "mimeType": result["mime"],
+        "md5": hash,
+        "size": Buffer.byteLength(req.body)
+      };
+
+      res.json(response);
+
+    });
+
+});
+
+app.get('/api/files/download/uri', (req, res) => {
+
+  res.set('Content-Disposition', 'attachment; filename="publicdomain.png"');
+
+  let response = {
+    "uri": 'https://azamstatic.blob.core.windows.net/static/publicdomain.png',
+    "originalName": "publicdomain.png",
+    "mimeType": "image/png",
+    "md5": 'c9469b266705cf08cfa37f0cf834d11f',
+    "size": 6592
+  };
+
+  res.json(response);
+});
+
+app.get('/api/files/download/uri/multi', (req, res) => {
+
+  let response = {
+    "files": [
+      {
+        "uri": 'https://azamstatic.blob.core.windows.net/static/publicdomain.png',
+        "originalName": "publicdomain.png",
+        "mimeType": "image/png",
+        "md5": 'c9469b266705cf08cfa37f0cf834d11f',
+        "size": 6592
+      },
+      {
+        "uri": 'https://azamstatic.blob.core.windows.net/static/creativecommons.png',
+        "originalName": "creativecommons.png",
+        "mimeType": "image/png",
+        "md5": '64bb88afbfcfe03145d176001d413154',
+        "size": 6413
+      }
+    ],
+    "count": 2
+  };
+
+  res.json(response);
+});
+
+app.get('/api/files/download/uri/multi/flattened', (req, res) => {
+
+  let response = {
+    "files": [
+      'https://azamstatic.blob.core.windows.net/static/publicdomain.png',
+      'https://azamstatic.blob.core.windows.net/static/creativecommons.png'
+    ],
+    "metadata": [
+      {
+        "originalName": "publicdomain.png",
+        "mimeType": "image/png",
+        "md5": 'c9469b266705cf08cfa37f0cf834d11f',
+        "size": 6592
+      },
+      {
+        "originalName": "creativecommons.png",
+        "mimeType": "image/png",
+        "md5": '64bb88afbfcfe03145d176001d413154',
+        "size": 6413
+      }
+    ],
+    "count": 2
+  };
+
+  res.json(response);
+});
+
+app.post('/api/files/upload/uri', async (req, res) => {
+  let sourceUri = req.body["fileUri"];
+
+  axios({
+    method: 'get',
+    url: sourceUri,
+    responseType: 'arraybuffer'
+  })
+  .then(async (downloaded) => {
+    const buffer = Buffer.from(downloaded.data, 'base64');
+    const mimeInfo = await fileType.fromBuffer(buffer);
+    const hash = crypto.createHash('md5').update(buffer).digest("hex");
+
+    let response = {
+      "customName": req.body["customName"],
+      "mimeType": mimeInfo["mime"],
+      "md5": hash,
+      "size": Buffer.byteLength(buffer, 'base64')
+    };
+    
+    res.json(response);
+  });
+
+});
+
+app.post('/api/files/upload/uri/multi', async (req, res) => {
+
+  let response = {};
+  response["files"] = [];
+
+  for (let i in req.body) {
+
+    const sourceUri = req.body[i]["fileUri"];
+
+    await axios({
+      method: 'get',
+      url: sourceUri,
+      responseType: 'arraybuffer'
+    })
+    .then(async (downloaded) => {
+      const buffer = Buffer.from(downloaded.data, 'base64');
+      const mimeInfo = await fileType.fromBuffer(buffer);
+      const hash = crypto.createHash('md5').update(buffer).digest("hex");
+
+      const fileDetails = {
+        "customName": req.body[i]["customName"],
+        "mimeType": mimeInfo["mime"],
+        "md5": hash,
+        "size": Buffer.byteLength(buffer, 'base64')
+      };
+
+      response["files"].push(fileDetails);
+    });
+
+  }
+
+  response["count"] = response["files"].length;
+
+  res.json(response);
 });
 
 app.post('/api/all-types', (req, res) => {
