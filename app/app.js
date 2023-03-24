@@ -43,6 +43,9 @@ app.get('/api/docs/:requestPath', (req, res) => {
     if(err) {
       res.status(404);
     }
+    if(obj.hasOwnProperty('host') && (obj.host == '##HOST_PLACEHOLDER##')) {
+      obj.host = process.env.API_HOST;
+    }
     res.json(obj);
   });
 });
