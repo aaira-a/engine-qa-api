@@ -28,6 +28,14 @@ describe('GET /api/hello', () => {
 
 describe('GET /api/docs/', () => {
 
+  before(() => {
+    env = process.env;
+  });
+
+  after(() => {
+    process.env = env;
+  });
+
   it('should return 200 status for existing file', () => {
     return request(app)
       .get('/api/docs/swagger.json')
@@ -44,6 +52,15 @@ describe('GET /api/docs/', () => {
       })
   });
 
+  it('should replace placeholder with environment variable for existing file', () => {
+    process.env.API_HOST = 'myhost123';
+    return request(app)
+      .get('/api/docs/swagger.json')
+      .then((response) => {
+        expect(response.status).to.eql(200);
+        expect(response.body).to.include({host: 'myhost123'});
+      })
+  });
 });
 
 describe('ALL /api/echo/:status?', () => {

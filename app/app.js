@@ -42,10 +42,14 @@ app.get('/api/docs/:requestPath', (req, res) => {
   jsonfile.readFile(file, (err, obj) => {
     if(err) {
       res.status(404);
-    }
-    if(obj.hasOwnProperty('host') && (obj.host == '##HOST_PLACEHOLDER##')) {
-      obj.host = process.env.API_HOST;
-    }
+    } 
+    if(
+        (obj !== undefined) &&
+        (obj.hasOwnProperty('host')) && 
+        (obj.host == '##HOST_PLACEHOLDER##')) 
+      {
+        obj.host = process.env.API_HOST;
+      }
     res.json(obj);
   });
 });
