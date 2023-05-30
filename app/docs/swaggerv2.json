@@ -2,8 +2,8 @@
   "swagger": "2.0",
   "info": {
     "version": "0.0.1",
-    "title": "Engine QA API Web Service",
-    "description": "Engine QA API Web Service"
+    "title": "Engine QA API Web Service V2",
+    "description": "Engine QA API Web Service V2"
   },
   "x-ntx-render-version": 2,
   "host": "##HOST_PLACEHOLDER##",
