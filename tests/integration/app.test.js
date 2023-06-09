@@ -104,7 +104,6 @@ describe('ALL /api/echo/:status?', () => {
   it('should return orignal url in echo-originalurl property', () => {
     return request(app)
       .get('/api/echo?abc=def&ghi=jkl')
-      .set('x-waws-unencoded-url', '/api/echo?abc=def&ghi=jkl')
       .then((response) => {
         expect(response.body['echo-originalurl']).to.eql('/api/echo?abc=def&ghi=jkl');
       })
@@ -1510,7 +1509,6 @@ describe('POST /api/query-encoding', () => {
     return request(app)
       .post('/api/query-encoding?string_query=text%20with%20spaces')
       .set('Content-Type', 'application/json')
-      .set('x-waws-unencoded-url', '/api/query-encoding?string_query=text%20with%20spaces')
       .send({})
       .then((response) => {
         expect(response.status).to.eql(200);
@@ -1522,7 +1520,6 @@ describe('POST /api/query-encoding', () => {
     return request(app)
       .post('/api/query-encoding?string_query=text+with+spaces')
       .set('Content-Type', 'application/json')
-      .set('x-waws-unencoded-url', '/api/query-encoding?string_query=text+with+spaces')
       .send({})
       .then((response) => {
         expect(response.status).to.eql(200);
@@ -1534,7 +1531,6 @@ describe('POST /api/query-encoding', () => {
     return request(app)
       .post("/api/query-encoding?string_query=%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%25%20")
       .set('Content-Type', 'application/json')
-      .set('x-waws-unencoded-url', "/api/query-encoding?string_query=%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%25%20")
       .send({})
       .then((response) => {
         expect(response.status).to.eql(200);

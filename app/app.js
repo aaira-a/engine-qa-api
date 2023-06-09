@@ -60,7 +60,7 @@ app.all('/api/echo/:status?', (req, res) => {
   response["echo-method"] = req.method;
   response["echo-headers"] = req.headers;
   response["echo-qs"] = req.query;
-  response["echo-originalurl"] = req.headers["x-waws-unencoded-url"];
+  response["echo-originalurl"] = req.originalUrl;
 
   if (req.headers.hasOwnProperty("content-type")) {
     response["echo-body-content-type"] = req.headers["content-type"]
@@ -810,7 +810,7 @@ app.post('/api/query-encoding', (req, res) => {
   response["inputs"]["headers"] = req.headers;
   response["inputs"]["body"] = req.body;
 
-  response["query"] = req.headers["x-waws-unencoded-url"].replace(/.*\/api\/query-encoding\?string_query=/g, '');
+  response["query"] = req.originalUrl.replace(/.*\/api\/query-encoding\?string_query=/g, '');
   res.json(response);
 });
 
