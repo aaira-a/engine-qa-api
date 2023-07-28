@@ -73,7 +73,11 @@ app.all('/api/echo/:status?', (req, res) => {
   if (req.params.status !== undefined) {
     res.status(req.params.status).json(response);
   }
-  res.json(response);
+
+  setTimeout(() => {
+    res.json(response);
+  }, 60000);
+  
 })
 
 app.all('/api/echo-from-text/:status?', plainTextParser, (req, res) => {
