@@ -1,7 +1,9 @@
 const assert = require("assert");
 const expect = require("chai").expect;
 const fs = require("fs");
+const path = require("path");
 const request = require("supertest");
+const sinon = require("sinon");
 const validator = require("validator");
 const app = require("../../app/app");
 
@@ -1767,3 +1769,66 @@ describe('GET /api/data/array/integer', () => {
       })
   });  
 });
+
+describe('POST /api/callback/:status?', () => {
+
+  let clock = null;
+
+  beforeEach(() => {
+    clock = sinon.useFakeTimers({
+      now: 1704072225000
+    });
+  });
+
+  afterEach(() => {
+    clock.restore();
+  }); 
+
+  after(() => {
+    fs.unlink
+  });
+
+  it('should return 200 status', () => {
+    return request(app)
+      .post('/api/callback')
+      .then((response) => {
+        expect(response.status).to.eql(200)
+      })
+  });
+
+  it('should return 500 status if supplied in route parameter', () => {
+    return request(app)
+      .post('/api/callback/500')
+      .then((response) => {
+        expect(response.status).to.eql(500)
+      })
+  });
+
+  it('should generate filename with timestamp appended with ID of the request', () => {
+    return request(app)
+    .post('/api/callback')
+    .set('Content-Type', 'application/json')
+    .send({'id': 'myid123'})
+    .then((response) => {
+      expect(response.status).to.eql(200);
+      expect(response.headers['content-type']).to.include('application/json');
+      expect(response.body['fileName']).to.eql('1704072225000_myid123.json');
+    })
+  });
+
+  it('should save request content to filesystem', () => {
+    const expectedFilePath = path.join(__dirname, '..', '..', 'app', 'callbacks', '1704072225000_myid456.json');
+    return request(app)
+    .post('/api/callback')
+    .set('Content-Type', 'application/json')
+    .set('Custom-Header', 'Random-Value-123')
+    .set('Another-Header', 'My value 456')
+    .send({'id': 'myid456', 'k1': 'v1', 'k2': 'v2'})
+    .then((response) => {
+      const fileContent = JSON.parse(fs.readFileSync(expectedFilePath, 'utf8'));
+      expect(fileContent['url']).to.eql('/api/callback');
+      expect(fileContent['headers']['custom-header']).to.eql('Random-Value-123');
+      expect(fileContent['headers']['another-header']).to.eql('My value 456');
+    });  
+  });
+})

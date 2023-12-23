@@ -867,6 +867,35 @@ app.get('/api/data/array/integer', (req, res) => {
   res.json(elements);
 });
 
+app.post('/api/callback/:status?', (req, res) => {
+  let response = {};
+  let requestId = "empty";
+
+  if (req.hasOwnProperty("body") && req.body.hasOwnProperty("id")) {
+      requestId = req.body.id;
+  }
+
+  const timestamp = Date.now().toString();
+
+  const fileName = `${timestamp}_${requestId}.json`
+  response["fileName"] = fileName;
+  const filePath = path.join(__dirname, 'callbacks', fileName);
+
+  let fileContent = {
+    "url": req.originalUrl,
+    "headers": req.headers,
+    "body": req.body
+  };
+
+  fs.writeFileSync(filePath, JSON.stringify(fileContent));
+
+  if (req.params.status !== undefined) {
+    res.status(parseInt(req.params.status)).json(response);
+  }
+
+  res.json(response);
+});
+
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError) {
     let response = {};
