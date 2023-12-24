@@ -896,6 +896,35 @@ app.post('/api/callback/:status?', (req, res) => {
   res.json(response);
 });
 
+
+app.get('/api/callback/:id', (req, res) => {
+  const requestId = req.params.id;
+  const re = /(.*?)_(.*?).json/;
+  let allMatches = {};
+
+  const folderPath = path.join(__dirname, 'callbacks');
+  const sourceFileNames = fs.readdirSync(folderPath);
+
+  sourceFileNames.forEach(el => {
+    [,timestamp, savedId] = re.exec(el);
+    allMatches[timestamp] = savedId;
+  });
+
+  let matchesCount = 0;
+  let matchingFileNames = [];
+  Object.entries(allMatches).forEach(el => {
+    let fileName = '';
+    if(el[1] == requestId) {
+      fileName = `${el[0]}_${el[1]}.json`;
+      matchingFileNames.push(fileName);
+      matchesCount += 1;
+    };
+  });
+
+  res.json({"matches": matchesCount, "matchingFileNames": matchingFileNames});
+
+});
+
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError) {
     let response = {};

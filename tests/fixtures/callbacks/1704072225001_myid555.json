@@ -1,0 +1,18 @@
+{
+  "url": "/api/callback",
+  "headers": {
+    "host": "127.0.0.1:59004",
+    "accept-encoding": "gzip, deflate",
+    "user-agent": "node-superagent/3.8.3",
+    "content-type": "application/json",
+    "custom-header": "Random-Value-123",
+    "another-header": "My value 456",
+    "content-length": "36",
+    "connection": "close"
+  },
+  "body": {
+    "id": "myid555",
+    "k1": "v1",
+    "k2": "v2"
+  }
+}

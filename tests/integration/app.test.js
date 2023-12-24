@@ -1784,9 +1784,6 @@ describe('POST /api/callback/:status?', () => {
     clock.restore();
   }); 
 
-  after(() => {
-    fs.unlink
-  });
 
   it('should return 200 status', () => {
     return request(app)
@@ -1829,6 +1826,48 @@ describe('POST /api/callback/:status?', () => {
       expect(fileContent['url']).to.eql('/api/callback');
       expect(fileContent['headers']['custom-header']).to.eql('Random-Value-123');
       expect(fileContent['headers']['another-header']).to.eql('My value 456');
+    });
+  });
+});
+
+
+describe('GET /api/callback/:id', () => {
+
+  const sourcePath1 = path.join(__dirname, '..', 'fixtures', 'callbacks', '1704072225001_myid555.json');
+  const destPath1 = path.join(__dirname, '..', '..', 'app', 'callbacks', '1704072225001_myid555.json');
+  const sourcePath2 = path.join(__dirname, '..', 'fixtures', 'callbacks', '1704072226001_myid555.json');
+  const destPath2 = path.join(__dirname, '..', '..', 'app', 'callbacks', '1704072226001_myid555.json');
+
+  before(() => {
+    fs.copyFileSync(sourcePath1, destPath1);
+    fs.copyFileSync(sourcePath2, destPath2); 
+  });
+
+  // after(() => {
+  //   fs.unlinkSync(destPath1);
+  //   fs.unlinkSync(destPath2);
+  // }); 
+
+
+  it('should return matching count data from previous requests', () => {
+    return request(app)
+      .get('/api/callback/myid555')
+      .then((response) => {
+        expect(response.body['matches']).to.eql(2);
     });  
   });
-})
+
+  it('should return 0 count if no matching data', () => {
+    return request(app)
+      .get('/api/callback/myid999')
+      .then((response) => {
+        expect(response.body['matches']).to.eql(0);
+    });  
+  });
+
+  it('should return expected payload for matching data', () => {
+    
+  });
+
+});
+
