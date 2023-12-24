@@ -921,7 +921,21 @@ app.get('/api/callback/:id', (req, res) => {
     };
   });
 
-  res.json({"matches": matchesCount, "matchingFileNames": matchingFileNames});
+  let data = [];
+  matchingFileNames.forEach(el => {
+    [,elTimestamp, savedId2] = re.exec(el);
+    let elData = {};
+    elData["id"] = savedId2;
+    let elTimestampStr = new Date(parseInt(elTimestamp));
+    elData["timestamp"] = elTimestampStr.toISOString();
+    elData["fileName"] = el;
+
+    let obj = JSON.parse(fs.readFileSync(path.join(folderPath, el), 'utf8'));
+    elData["record"] = obj;
+    data.push(elData);
+  });
+
+  res.json({"matches": matchesCount, "data": data});
 
 });
 
