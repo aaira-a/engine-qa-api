@@ -903,7 +903,8 @@ app.get('/api/callback/:id', (req, res) => {
   let allMatches = {};
 
   const folderPath = path.join(__dirname, 'callbacks');
-  const sourceFileNames = fs.readdirSync(folderPath);
+  let sourceFileNames = fs.readdirSync(folderPath);
+  sourceFileNames = sourceFileNames.filter(item => item !== ".gitkeep");
 
   sourceFileNames.forEach(el => {
     [,timestamp, savedId] = re.exec(el);
