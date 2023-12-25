@@ -13,6 +13,8 @@ const path = require("path");
 
 const app = express();
 
+const CALLBACK_FOLDER_NAME = 'callbacks';
+
 const asyncCallbackRoute = require("./routes/asyncCallback");
 const sleepRoute = require("./routes/sleep");
 
@@ -879,7 +881,7 @@ app.post('/api/callback/:status?', (req, res) => {
 
   const fileName = `${timestamp}_${requestId}.json`
   response["fileName"] = fileName;
-  const filePath = path.join(__dirname, 'callbacks', fileName);
+  const filePath = path.join(__dirname, CALLBACK_FOLDER_NAME, fileName);
 
   let fileContent = {
     "url": req.originalUrl,
@@ -902,7 +904,7 @@ app.get('/api/callback/:id', (req, res) => {
   const re = /(.*?)_(.*?).json/;
   let allMatches = {};
 
-  const folderPath = path.join(__dirname, 'callbacks');
+  const folderPath = path.join(__dirname, CALLBACK_FOLDER_NAME);
   let sourceFileNames = fs.readdirSync(folderPath);
   sourceFileNames = sourceFileNames.filter(item => item !== ".gitkeep");
 

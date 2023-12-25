@@ -1772,6 +1772,7 @@ describe('GET /api/data/array/integer', () => {
 
 describe('POST /api/callback/:status?', () => {
 
+  const basePath = path.join(__dirname, '..', '..', 'app', 'callbacks');
   let clock = null;
 
   beforeEach(() => {
@@ -1785,9 +1786,9 @@ describe('POST /api/callback/:status?', () => {
   }); 
 
   after(() => {
-    const fileToCleanup1 = path.join(__dirname, '..', '..', 'app', 'callbacks', '1704072225000_empty.json');
-    const fileToCleanup2 = path.join(__dirname, '..', '..', 'app', 'callbacks', '1704072225000_myid123.json');
-    const fileToCleanup3 = path.join(__dirname, '..', '..', 'app', 'callbacks', '1704072225000_myid456.json');
+    const fileToCleanup1 = path.join(basePath, '1704072225000_empty.json');
+    const fileToCleanup2 = path.join(basePath, '1704072225000_myid123.json');
+    const fileToCleanup3 = path.join(basePath, '1704072225000_myid456.json');
     fs.unlinkSync(fileToCleanup1);
     fs.unlinkSync(fileToCleanup2);
     fs.unlinkSync(fileToCleanup3);
@@ -1824,7 +1825,7 @@ describe('POST /api/callback/:status?', () => {
   });
 
   it('should save request content to filesystem', () => {
-    const expectedFilePath = path.join(__dirname, '..', '..', 'app', 'callbacks', '1704072225000_myid456.json');
+    const expectedFilePath = path.join(basePath, '1704072225000_myid456.json');
     return request(app)
     .post('/api/callback')
     .set('Content-Type', 'application/json')
@@ -1843,10 +1844,13 @@ describe('POST /api/callback/:status?', () => {
 
 describe('GET /api/callback/:id', () => {
 
-  const sourcePath1 = path.join(__dirname, '..', 'fixtures', 'callbacks', '1704072225001_myid555.json');
-  const destPath1 = path.join(__dirname, '..', '..', 'app', 'callbacks', '1704072225001_myid555.json');
-  const sourcePath2 = path.join(__dirname, '..', 'fixtures', 'callbacks', '1704072226001_myid555.json');
-  const destPath2 = path.join(__dirname, '..', '..', 'app', 'callbacks', '1704072226001_myid555.json');
+  const fixturesBasePath = path.join(__dirname, '..', 'fixtures', 'callbacks');
+  const appBasePath = path.join(__dirname, '..', '..', 'app', 'callbacks');
+
+  const sourcePath1 = path.join(fixturesBasePath, '1704072225001_myid555.json');
+  const destPath1 = path.join(appBasePath, '1704072225001_myid555.json');
+  const sourcePath2 = path.join(fixturesBasePath, '1704072226001_myid555.json');
+  const destPath2 = path.join(appBasePath, '1704072226001_myid555.json');
 
   before(() => {
     fs.copyFileSync(sourcePath1, destPath1);
