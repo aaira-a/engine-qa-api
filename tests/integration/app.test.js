@@ -1,7 +1,9 @@
 const assert = require("assert");
 const expect = require("chai").expect;
 const fs = require("fs");
+const path = require("path");
 const request = require("supertest");
+const sinon = require("sinon");
 const validator = require("validator");
 const app = require("../../app/app");
 
@@ -1767,3 +1769,129 @@ describe('GET /api/data/array/integer', () => {
       })
   });  
 });
+
+describe('POST /api/callback/:status?', () => {
+
+  let clock = null;
+
+  beforeEach(() => {
+    clock = sinon.useFakeTimers({
+      now: 1704072225000
+    });
+  });
+
+  afterEach(() => {
+    clock.restore();
+  }); 
+
+  after(() => {
+    const fileToCleanup1 = path.join(__dirname, '..', '..', 'app', 'callbacks', '1704072225000_empty.json');
+    const fileToCleanup2 = path.join(__dirname, '..', '..', 'app', 'callbacks', '1704072225000_myid123.json');
+    const fileToCleanup3 = path.join(__dirname, '..', '..', 'app', 'callbacks', '1704072225000_myid456.json');
+    fs.unlinkSync(fileToCleanup1);
+    fs.unlinkSync(fileToCleanup2);
+    fs.unlinkSync(fileToCleanup3);
+  });
+
+
+  it('should return 200 status', () => {
+    return request(app)
+      .post('/api/callback')
+      .then((response) => {
+        expect(response.status).to.eql(200)
+      })
+  });
+
+  it('should return 500 status if supplied in route parameter', () => {
+    return request(app)
+      .post('/api/callback/500')
+      .then((response) => {
+        expect(response.status).to.eql(500)
+      })
+
+  });
+
+  it('should generate filename with timestamp appended with ID of the request', () => {
+    return request(app)
+    .post('/api/callback')
+    .set('Content-Type', 'application/json')
+    .send({'id': 'myid123'})
+    .then((response) => {
+      expect(response.status).to.eql(200);
+      expect(response.headers['content-type']).to.include('application/json');
+      expect(response.body['fileName']).to.eql('1704072225000_myid123.json');
+    })
+  });
+
+  it('should save request content to filesystem', () => {
+    const expectedFilePath = path.join(__dirname, '..', '..', 'app', 'callbacks', '1704072225000_myid456.json');
+    return request(app)
+    .post('/api/callback')
+    .set('Content-Type', 'application/json')
+    .set('Custom-Header', 'Random-Value-123')
+    .set('Another-Header', 'My value 456')
+    .send({'id': 'myid456', 'k1': 'v1', 'k2': 'v2'})
+    .then((response) => {
+      const fileContent = JSON.parse(fs.readFileSync(expectedFilePath, 'utf8'));
+      expect(fileContent['url']).to.eql('/api/callback');
+      expect(fileContent['headers']['custom-header']).to.eql('Random-Value-123');
+      expect(fileContent['headers']['another-header']).to.eql('My value 456');
+    });
+  });
+});
+
+
+describe('GET /api/callback/:id', () => {
+
+  const sourcePath1 = path.join(__dirname, '..', 'fixtures', 'callbacks', '1704072225001_myid555.json');
+  const destPath1 = path.join(__dirname, '..', '..', 'app', 'callbacks', '1704072225001_myid555.json');
+  const sourcePath2 = path.join(__dirname, '..', 'fixtures', 'callbacks', '1704072226001_myid555.json');
+  const destPath2 = path.join(__dirname, '..', '..', 'app', 'callbacks', '1704072226001_myid555.json');
+
+  before(() => {
+    fs.copyFileSync(sourcePath1, destPath1);
+    fs.copyFileSync(sourcePath2, destPath2); 
+  });
+
+  after(() => {
+    fs.unlinkSync(destPath1);
+    fs.unlinkSync(destPath2);
+  }); 
+
+
+  it('should return matching count data from previous requests', () => {
+    return request(app)
+      .get('/api/callback/myid555')
+      .then((response) => {
+        expect(response.body['matches']).to.eql(2);
+    });  
+  });
+
+  it('should return 0 count if no matching data', () => {
+    return request(app)
+      .get('/api/callback/myid999')
+      .then((response) => {
+        expect(response.body['matches']).to.eql(0);
+        expect(response.body['data']).to.eql([]);
+    });  
+  });
+
+  it('should return expected payload for matching data', () => {
+    return request(app)
+      .get('/api/callback/myid555')
+      .then((response) => {
+        expect(response.body['data'][0]['id']).to.eql('myid555');
+        expect(response.body['data'][1]['id']).to.eql('myid555');
+        expect(response.body['data'][0]['timestamp']).to.eql('2024-01-01T01:23:45.001Z');
+        expect(response.body['data'][1]['timestamp']).to.eql('2024-01-01T01:23:46.001Z');
+        expect(response.body['data'][0]['fileName']).to.eql('1704072225001_myid555.json');
+        expect(response.body['data'][1]['fileName']).to.eql('1704072226001_myid555.json');
+        expect(response.body['data'][0]['record']['headers']['custom-header']).to.eql('Random-Value-abc');
+        expect(response.body['data'][1]['record']['headers']['custom-header']).to.eql('Random-Value-xyz');
+        expect(response.body['data'][0]['record']['body']['k1']).to.eql('v1');
+        expect(response.body['data'][1]['record']['body']['k1']).to.eql('v3');
+    }); 
+  });
+
+});
+

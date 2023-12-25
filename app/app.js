@@ -867,6 +867,79 @@ app.get('/api/data/array/integer', (req, res) => {
   res.json(elements);
 });
 
+app.post('/api/callback/:status?', (req, res) => {
+  let response = {};
+  let requestId = "empty";
+
+  if (req.hasOwnProperty("body") && req.body.hasOwnProperty("id")) {
+      requestId = req.body.id;
+  }
+
+  const timestamp = Date.now().toString();
+
+  const fileName = `${timestamp}_${requestId}.json`
+  response["fileName"] = fileName;
+  const filePath = path.join(__dirname, 'callbacks', fileName);
+
+  let fileContent = {
+    "url": req.originalUrl,
+    "headers": req.headers,
+    "body": req.body
+  };
+
+  fs.writeFileSync(filePath, JSON.stringify(fileContent));
+
+  if (req.params.status !== undefined) {
+    res.status(parseInt(req.params.status)).json(response);
+  }
+
+  res.json(response);
+});
+
+
+app.get('/api/callback/:id', (req, res) => {
+  const requestId = req.params.id;
+  const re = /(.*?)_(.*?).json/;
+  let allMatches = {};
+
+  const folderPath = path.join(__dirname, 'callbacks');
+  let sourceFileNames = fs.readdirSync(folderPath);
+  sourceFileNames = sourceFileNames.filter(item => item !== ".gitkeep");
+
+  sourceFileNames.forEach(el => {
+    [,timestamp, savedId] = re.exec(el);
+    allMatches[timestamp] = savedId;
+  });
+
+  let matchesCount = 0;
+  let matchingFileNames = [];
+  Object.entries(allMatches).forEach(el => {
+    let fileName = '';
+    if(el[1] == requestId) {
+      fileName = `${el[0]}_${el[1]}.json`;
+      matchingFileNames.push(fileName);
+      matchesCount += 1;
+    };
+  });
+
+  let data = [];
+  matchingFileNames.forEach(el => {
+    [,elTimestamp, savedId2] = re.exec(el);
+    let elData = {};
+    elData["id"] = savedId2;
+    let elTimestampStr = new Date(parseInt(elTimestamp));
+    elData["timestamp"] = elTimestampStr.toISOString();
+    elData["fileName"] = el;
+
+    let obj = JSON.parse(fs.readFileSync(path.join(folderPath, el), 'utf8'));
+    elData["record"] = obj;
+    data.push(elData);
+  });
+
+  res.json({"matches": matchesCount, "data": data});
+
+});
+
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError) {
     let response = {};

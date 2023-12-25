@@ -1,0 +1,7 @@
+Cron to delete file in folder older than x age
+
+// current config for files older than 7 days
+0 0 * * * /usr/bin/find /home/ubuntu/engine-qa-api/app/callbacks -name "*.json" -type f -mtime +7 -exec rm -f {} \;
+
+// testing config for files older than 1 minute
+5 9 * * * /usr/bin/find /home/ubuntu/engine-qa-api/app/callbacks -name "*.json" -type f -mmin +1 -exec rm -f {} \;
