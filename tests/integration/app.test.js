@@ -1784,6 +1784,15 @@ describe('POST /api/callback/:status?', () => {
     clock.restore();
   }); 
 
+  after(() => {
+    const fileToCleanup1 = path.join(__dirname, '..', '..', 'app', 'callbacks', '1704072225000_empty.json');
+    const fileToCleanup2 = path.join(__dirname, '..', '..', 'app', 'callbacks', '1704072225000_myid123.json');
+    const fileToCleanup3 = path.join(__dirname, '..', '..', 'app', 'callbacks', '1704072225000_myid456.json');
+    fs.unlinkSync(fileToCleanup1);
+    fs.unlinkSync(fileToCleanup2);
+    fs.unlinkSync(fileToCleanup3);
+  });
+
 
   it('should return 200 status', () => {
     return request(app)
@@ -1799,6 +1808,7 @@ describe('POST /api/callback/:status?', () => {
       .then((response) => {
         expect(response.status).to.eql(500)
       })
+
   });
 
   it('should generate filename with timestamp appended with ID of the request', () => {
@@ -1843,10 +1853,10 @@ describe('GET /api/callback/:id', () => {
     fs.copyFileSync(sourcePath2, destPath2); 
   });
 
-  // after(() => {
-  //   fs.unlinkSync(destPath1);
-  //   fs.unlinkSync(destPath2);
-  // }); 
+  after(() => {
+    fs.unlinkSync(destPath1);
+    fs.unlinkSync(destPath2);
+  }); 
 
 
   it('should return matching count data from previous requests', () => {
