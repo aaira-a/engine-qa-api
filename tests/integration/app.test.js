@@ -1876,7 +1876,7 @@ describe('GET /api/callback/:id', () => {
       .get('/api/callback/myid999')
       .then((response) => {
         expect(response.body['matches']).to.eql(0);
-        expect(response.body['data']).to.eql([]);
+        expect(response.body['records']).to.eql([]);
     });  
   });
 
@@ -1884,16 +1884,16 @@ describe('GET /api/callback/:id', () => {
     return request(app)
       .get('/api/callback/myid555')
       .then((response) => {
-        expect(response.body['data'][0]['id']).to.eql('myid555');
-        expect(response.body['data'][1]['id']).to.eql('myid555');
-        expect(response.body['data'][0]['timestamp']).to.eql('2024-01-01T01:23:45.001Z');
-        expect(response.body['data'][1]['timestamp']).to.eql('2024-01-01T01:23:46.001Z');
-        expect(response.body['data'][0]['fileName']).to.eql('1704072225001_myid555.json');
-        expect(response.body['data'][1]['fileName']).to.eql('1704072226001_myid555.json');
-        expect(response.body['data'][0]['record']['headers']['custom-header']).to.eql('Random-Value-abc');
-        expect(response.body['data'][1]['record']['headers']['custom-header']).to.eql('Random-Value-xyz');
-        expect(response.body['data'][0]['record']['body']['k1']).to.eql('v1');
-        expect(response.body['data'][1]['record']['body']['k1']).to.eql('v3');
+        expect(response.body['records'][0]['id']).to.eql('myid555');
+        expect(response.body['records'][1]['id']).to.eql('myid555');
+        expect(response.body['records'][0]['timestamp']).to.eql('2024-01-01T01:23:45.001Z');
+        expect(response.body['records'][1]['timestamp']).to.eql('2024-01-01T01:23:46.001Z');
+        expect(response.body['records'][0]['fileName']).to.eql('1704072225001_myid555.json');
+        expect(response.body['records'][1]['fileName']).to.eql('1704072226001_myid555.json');
+        expect(response.body['records'][0]['data']['headers']['custom-header']).to.eql('Random-Value-abc');
+        expect(response.body['records'][1]['data']['headers']['custom-header']).to.eql('Random-Value-xyz');
+        expect(response.body['records'][0]['data']['body']['k1']).to.eql('v1');
+        expect(response.body['records'][1]['data']['body']['k1']).to.eql('v3');
     }); 
   });
 

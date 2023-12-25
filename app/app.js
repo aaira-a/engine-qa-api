@@ -924,7 +924,7 @@ app.get('/api/callback/:id', (req, res) => {
     };
   });
 
-  let data = [];
+  let records = [];
   matchingFileNames.forEach(el => {
     [,elTimestamp, savedId2] = re.exec(el);
     let elData = {};
@@ -934,11 +934,11 @@ app.get('/api/callback/:id', (req, res) => {
     elData["fileName"] = el;
 
     let obj = JSON.parse(fs.readFileSync(path.join(folderPath, el), 'utf8'));
-    elData["record"] = obj;
-    data.push(elData);
+    elData["data"] = obj;
+    records.push(elData);
   });
 
-  res.json({"matches": matchesCount, "data": data});
+  res.json({"matches": matchesCount, "records": records});
 
 });
 
