@@ -1773,6 +1773,7 @@ describe('GET /api/data/array/integer', () => {
 describe('POST /api/callback/:status?', () => {
 
   const basePath = path.join(__dirname, '..', '..', 'app', 'callbacks');
+  const headerValueWithInstanceId = 'ReqUri=https%3A%2F%2Faaira.free.beeceptor.com%2Fcallback, OrcId=1cb85679-9b22-49e3-94ea-3478721f42d0_0_4, ActId=1cb85679-9b22-49e3-94ea-3478721f42d0_0_4-4, Locale=, WorkId=eef033af-ecc8-4f90-874b-89124fa7c225, EVer=12-l10n, InstanceId=1cb85679-9b22-49e3-94ea-3478721f42d0_0_4, AntId=504e5796-f398-4ba5-8b45-90312fda6f0a, CorId=fdaec645-f86f-4e68-bf3d-259eceb4b1f1, cor-id=fdaec645-f86f-4e68-bf3d-259eceb4b1f1';
   let clock = null;
 
   beforeEach(() => {
@@ -1787,11 +1788,9 @@ describe('POST /api/callback/:status?', () => {
 
   after(() => {
     const fileToCleanup1 = path.join(basePath, '1704072225000_empty.json');
-    const fileToCleanup2 = path.join(basePath, '1704072225000_myid123.json');
-    const fileToCleanup3 = path.join(basePath, '1704072225000_myid456.json');
+    const fileToCleanup2 = path.join(basePath, '1704072225000_1cb85679-9b22-49e3-94ea-3478721f42d0_0_4.json');
     fs.unlinkSync(fileToCleanup1);
     fs.unlinkSync(fileToCleanup2);
-    fs.unlinkSync(fileToCleanup3);
   });
 
 
@@ -1812,26 +1811,28 @@ describe('POST /api/callback/:status?', () => {
 
   });
 
-  it('should generate filename with timestamp appended with ID of the request', () => {
+  it('should generate filename with timestamp appended with InstanceId from correlation-context header of the request', () => {
     return request(app)
     .post('/api/callback')
     .set('Content-Type', 'application/json')
-    .send({'id': 'myid123'})
+    .set('correlation-context', headerValueWithInstanceId)
+    .send({'key1': 'value1'})
     .then((response) => {
       expect(response.status).to.eql(200);
       expect(response.headers['content-type']).to.include('application/json');
-      expect(response.body['fileName']).to.eql('1704072225000_myid123.json');
+      expect(response.body['fileName']).to.eql('1704072225000_1cb85679-9b22-49e3-94ea-3478721f42d0_0_4.json');
     })
   });
 
   it('should save request content to filesystem', () => {
-    const expectedFilePath = path.join(basePath, '1704072225000_myid456.json');
+    const expectedFilePath = path.join(basePath, '1704072225000_1cb85679-9b22-49e3-94ea-3478721f42d0_0_4.json');
     return request(app)
     .post('/api/callback')
     .set('Content-Type', 'application/json')
+    .set('correlation-context', headerValueWithInstanceId)
     .set('Custom-Header', 'Random-Value-123')
     .set('Another-Header', 'My value 456')
-    .send({'id': 'myid456', 'k1': 'v1', 'k2': 'v2'})
+    .send({'k1': 'v1', 'k2': 'v2'})
     .then((response) => {
       const fileContent = JSON.parse(fs.readFileSync(expectedFilePath, 'utf8'));
       expect(fileContent['url']).to.eql('/api/callback');
