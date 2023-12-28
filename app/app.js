@@ -872,7 +872,7 @@ app.get('/api/data/array/integer', (req, res) => {
 app.post('/api/callback/:status?', (req, res) => {
   let response = {};
   let requestId = "empty";
-  const re = /InstanceId=(.+?),/;
+  const re = /[^n]InstanceId=(.+?),/;
 
   if (req.headers.hasOwnProperty("correlation-context")) {
     [,instanceId] = re.exec(req.headers["correlation-context"]);
