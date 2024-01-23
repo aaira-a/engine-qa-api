@@ -1898,5 +1898,19 @@ describe('GET /api/callback/:id', () => {
     }); 
   });
 
+  it('should display index of folder if no ID parameter is provided', () => {
+    const expectedPayload = {
+      "files": [
+        "1704072225001_myid555.json",
+        "1704072226001_myid555.json"
+      ]
+    };
+    return request(app)
+    .get('/api/callback')
+    .then((response) => {
+      expect(response.body).to.eql(expectedPayload);
+    });
+  });
+
 });
 

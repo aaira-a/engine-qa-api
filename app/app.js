@@ -901,46 +901,59 @@ app.post('/api/callback/:status?', (req, res) => {
 });
 
 
-app.get('/api/callback/:id', (req, res) => {
-  const requestId = req.params.id;
-  const re = /(.*?)_(.*?).json/;
-  let allMatches = {};
+app.get('/api/callback/:id?', (req, res) => {
+  let requestId = "##NONE##";
 
-  const folderPath = path.join(__dirname, CALLBACK_FOLDER_NAME);
-  let sourceFileNames = fs.readdirSync(folderPath);
-  sourceFileNames = sourceFileNames.filter(item => item !== ".gitkeep");
+  // return list of files in directory if ID parameter not provided
+  if (req.params.id == undefined) {
+    const folderPath = path.join(__dirname, CALLBACK_FOLDER_NAME);
+    let sourceFileNames = fs.readdirSync(folderPath);
+    sourceFileNames = sourceFileNames.filter(item => item !== ".gitkeep");
+    res.json({"files": sourceFileNames});
+  }
 
-  sourceFileNames.forEach(el => {
-    [,timestamp, savedId] = re.exec(el);
-    allMatches[timestamp] = savedId;
-  });
+  // regular processing
+  else {
+    requestId = req.params.id;
+    const re = /(.*?)_(.*?).json/;
+    let allMatches = {};
 
-  let matchesCount = 0;
-  let matchingFileNames = [];
-  Object.entries(allMatches).forEach(el => {
-    let fileName = '';
-    if(el[1] == requestId) {
-      fileName = `${el[0]}_${el[1]}.json`;
-      matchingFileNames.push(fileName);
-      matchesCount += 1;
-    };
-  });
+    const folderPath = path.join(__dirname, CALLBACK_FOLDER_NAME);
+    let sourceFileNames = fs.readdirSync(folderPath);
+    sourceFileNames = sourceFileNames.filter(item => item !== ".gitkeep");
 
-  let records = [];
-  matchingFileNames.forEach(el => {
-    [,elTimestamp, savedId2] = re.exec(el);
-    let elData = {};
-    elData["id"] = savedId2;
-    let elTimestampStr = new Date(parseInt(elTimestamp));
-    elData["timestamp"] = elTimestampStr.toISOString();
-    elData["fileName"] = el;
+    sourceFileNames.forEach(el => {
+      [,timestamp, savedId] = re.exec(el);
+      allMatches[timestamp] = savedId;
+    });
 
-    let obj = JSON.parse(fs.readFileSync(path.join(folderPath, el), 'utf8'));
-    elData["data"] = obj;
-    records.push(elData);
-  });
+    let matchesCount = 0;
+    let matchingFileNames = [];
+    Object.entries(allMatches).forEach(el => {
+      let fileName = '';
+      if(el[1] == requestId) {
+        fileName = `${el[0]}_${el[1]}.json`;
+        matchingFileNames.push(fileName);
+        matchesCount += 1;
+      };
+    });
 
-  res.json({"matches": matchesCount, "records": records});
+    let records = [];
+    matchingFileNames.forEach(el => {
+      [,elTimestamp, savedId2] = re.exec(el);
+      let elData = {};
+      elData["id"] = savedId2;
+      let elTimestampStr = new Date(parseInt(elTimestamp));
+      elData["timestamp"] = elTimestampStr.toISOString();
+      elData["fileName"] = el;
+
+      let obj = JSON.parse(fs.readFileSync(path.join(folderPath, el), 'utf8'));
+      elData["data"] = obj;
+      records.push(elData);
+    });
+
+    res.json({"matches": matchesCount, "records": records});
+  }
 
 });
 
