@@ -903,19 +903,36 @@ app.post('/api/callback/:status?', (req, res) => {
 
 app.get('/api/callback/:id?', (req, res) => {
   let requestId = "##NONE##";
+  const re = /(.*?)_(.*?).json/;
 
   // return list of files in directory if ID parameter not provided
   if (req.params.id == undefined) {
+    
+    let allFileNames = [];
+
     const folderPath = path.join(__dirname, CALLBACK_FOLDER_NAME);
     let sourceFileNames = fs.readdirSync(folderPath);
     sourceFileNames = sourceFileNames.filter(item => item !== ".gitkeep");
-    res.json({"files": sourceFileNames});
+    
+    sourceFileNames.forEach(el => {
+      let currentFileElement = {};
+      [,timestamp,] = re.exec(el);
+
+      let indexTimestamp = new Date(parseInt(timestamp));
+
+      currentFileElement["datetime"] = indexTimestamp.toISOString();
+      currentFileElement["fileName"] = el;
+
+      allFileNames.push(currentFileElement);
+    });
+
+    res.json({"files": allFileNames});
+    // res.json({"files": sourceFileNames});
   }
 
   // regular processing
   else {
     requestId = req.params.id;
-    const re = /(.*?)_(.*?).json/;
     let allMatches = {};
 
     const folderPath = path.join(__dirname, CALLBACK_FOLDER_NAME);

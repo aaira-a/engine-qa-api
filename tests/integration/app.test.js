@@ -1901,8 +1901,8 @@ describe('GET /api/callback/:id', () => {
   it('should display index of folder if no ID parameter is provided', () => {
     const expectedPayload = {
       "files": [
-        "1704072225001_myid555.json",
-        "1704072226001_myid555.json"
+        {"fileName": "1704072225001_myid555.json", "datetime": "2024-01-01T01:23:45.001Z"},
+        {"fileName": "1704072226001_myid555.json", "datetime": "2024-01-01T01:23:46.001Z"}
       ]
     };
     return request(app)
