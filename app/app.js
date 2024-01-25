@@ -6,6 +6,7 @@ const crypto = require("crypto");
 const fileType = require("file-type");
 const fs = require("fs");
 const jsonfile = require("jsonfile");
+const moment = require("moment");
 const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({storage: storage});
@@ -916,12 +917,14 @@ app.get('/api/callback/:id?', (req, res) => {
 
     sourceFileNames.forEach(el => {
       let currentFileElement = {};
-      [,timestamp,] = re.exec(el);
+      [,timestamp, savedId] = re.exec(el);
 
       let indexTimestamp = new Date(parseInt(timestamp));
 
       currentFileElement["datetime"] = indexTimestamp.toISOString();
+      currentFileElement["fileAge"] = moment(parseInt(timestamp)).startOf("day").fromNow();
       currentFileElement["fileName"] = el;
+      currentFileElement["instanceId"] = savedId;
 
       allFileNames.push(currentFileElement);
     });

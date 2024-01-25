@@ -1853,10 +1853,20 @@ describe('GET /api/callback/:id', () => {
   const sourcePath2 = path.join(fixturesBasePath, '1704072226001_myid555.json');
   const destPath2 = path.join(appBasePath, '1704072226001_myid555.json');
 
+  beforeEach(() => {
+    clock = sinon.useFakeTimers({
+      now: 1705281825000
+    });
+  });
+
   before(() => {
     fs.copyFileSync(sourcePath1, destPath1);
     fs.copyFileSync(sourcePath2, destPath2); 
   });
+
+  afterEach(() => {
+    clock.restore();
+  }); 
 
   after(() => {
     fs.unlinkSync(destPath1);
@@ -1901,8 +1911,18 @@ describe('GET /api/callback/:id', () => {
   it('should display index of folder if no ID parameter is provided', () => {
     const expectedPayload = {
       "files": [
-        {"fileName": "1704072225001_myid555.json", "datetime": "2024-01-01T01:23:45.001Z"},
-        {"fileName": "1704072226001_myid555.json", "datetime": "2024-01-01T01:23:46.001Z"}
+        {
+          "fileName": "1704072225001_myid555.json",
+          "datetime": "2024-01-01T01:23:45.001Z",
+          "fileAge": "14 days ago",
+          "instanceId": "myid555"
+        },
+        {
+          "fileName": "1704072226001_myid555.json",
+          "datetime": "2024-01-01T01:23:46.001Z",
+          "fileAge": "14 days ago",
+          "instanceId": "myid555"
+        }
       ]
     };
     return request(app)
