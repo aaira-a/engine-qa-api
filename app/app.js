@@ -922,7 +922,7 @@ app.get('/api/callback/:id?', (req, res) => {
       let indexTimestamp = new Date(parseInt(timestamp));
 
       currentFileElement["datetime"] = indexTimestamp.toISOString();
-      currentFileElement["fileAge"] = moment(parseInt(timestamp)).startOf("day").fromNow();
+      currentFileElement["fileAge"] = moment(parseInt(timestamp)).fromNow();
       currentFileElement["fileName"] = el;
       currentFileElement["instanceId"] = savedId;
 
