@@ -1,0 +1,110 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "0.0.1",
+    "title": "On-Premise Engine QA API Web Service V2",
+    "description": "On-Premise Engine QA API Web Service V2"
+  },
+  "x-ntx-render-version": 2,
+  "x-ntx-host": "{{x-ntx-gateway-uri}}",
+  "host": "##HOST_PLACEHOLDER##",
+  "basePath": "/xtension/",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "basic": []
+    }
+  ],
+  "securityDefinitions": {
+    "basic": {
+      "type": "basic",
+      "x-ntx-connection-validation": {
+        "operationId": "validateConnection"
+      },
+      "x-ntx-connection-properties": {
+        "type": "object",
+        "required": [
+          "x-ntx-gateway-id",
+          "x-ntx-gateway-xtension-baseurl",
+          "x-ntx-gateway-apikey",
+          "username",
+          "password"
+        ],
+        "properties": {
+          "x-ntx-gateway-id": {
+            "type": "string",
+            "title": "Select Ntx Gateway"
+          },
+          "x-ntx-gateway-xtension-baseurl": {
+            "type": "string",
+            "title": "On-premises service URL",
+            "description": "Base URL of the on-premises service, including HTTPS://.",
+            "pattern": "^(https?://[^/?#]+)(?:[/]|/.+|)$"
+          },
+          "username": {
+            "type": "string",
+            "title": "On-premises application username"
+          },
+          "password": {
+            "type": "string",
+            "title": "On-premises application password"
+          },
+          "x-ntx-gateway-apikey": {
+            "type": "string",
+            "title": "Ntx Gateway API key"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/x-ntx-validate": {
+      "get": {
+        "operationId": "validateConnection",
+        "x-ntx-visibility": "internal",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "default": {
+            "description": "Operation Failed."
+          }
+        }
+      }
+    },
+    "/api/data/array/integer": {
+      "get": {
+        "summary": "Returns array of integers",
+        "description": "Returns array of integers",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "elements",
+            "description": "Number of elements to be returned",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
