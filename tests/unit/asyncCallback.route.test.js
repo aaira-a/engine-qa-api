@@ -17,7 +17,7 @@ describe('POST /api/async-callback route', () => {
     clock.restore();
   }); 
 
-  it('callCallback function should call url after 15000 milliseconds', () => {
+  it('callCallback function should call url with correct headers after 15000 milliseconds', () => {
     axios.post = sinon.spy();
     const payload = {"outputs": {"callbackUrl": "myurl"}};
 
@@ -28,7 +28,11 @@ describe('POST /api/async-callback route', () => {
     expect(axios.post.called).to.eql(false);
 
     clock.tick(5000);
-    expect(axios.post.calledWith("myurl", payload)).to.eql(true);
+    const expectedHeaders = {
+      'Dummy-Header': 'happy-testing',
+      'Qa-Api-Header': 'happy-qa',
+    };
+    expect(axios.post.calledWith("myurl", payload, { headers: expectedHeaders })).to.eql(true);
   });
 
   it('post function should call callCallback with callbackUrl in json response', () => {

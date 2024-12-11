@@ -4,9 +4,16 @@ const uuidv4 = require("uuid/v4");
 module.exports = {
   callCallbackUrl: function(payload) {
     const urlToCall = payload["outputs"]["callbackUrl"];
+    const headers = {
+      'Dummy-Header': 'happy-testing',
+      'Qa-Api-Header': 'happy-qa'
+    }
 
     setTimeout(() => {
-      axios.post(urlToCall, payload)
+      axios.post(urlToCall, payload,
+        {
+          headers: headers
+        })
     }, 15000);
   },
 
